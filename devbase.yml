@@ -4,7 +4,7 @@
   gather_facts: false
   tasks:
   - name: Install packages for Ansible support
-    raw: dnf -y -e0 -d0 install python python-dnf
+    raw: dnf -y -e0 -d0 install python python-dnf libselinux-python
 
 - hosts: all
   become: yes
@@ -19,8 +19,15 @@
     - zsh
     - ruby
     - rubygems
+    - emacs
+  roles:
+  - docker
+
+- hosts: all
+  become: yes
+  tasks:
   - name: Set default shell
-    user: name=vagrant shell=/bin/zsh
+    user: name=vagrant shell=/bin/zsh groups=docker append=yes
 
 - hosts: all
   tasks:
@@ -28,7 +35,13 @@
     git: repo=https://github.com/zsh-users/antigen.git dest="{{ ansible_env.HOME }}/config/antigen"
   - name: Install homesick
     gem: name=homesick state=latest
+  - name: Check if dotfiles already cloned
+    shell: homesick status dotfiles
+    register: result
+    ignore_errors: true
+    changed_when: "result.rc != 0"
   - name: Configure castle
-    shell: >-
-      homesick clone malkarouri/dotfiles &&
-      homesick symlink dotfiles
+    shell: homesick clone malkarouri/dotfiles
+    when: result|failed
+  - name: Configure castle
+    shell: homesick symlink dotfiles
