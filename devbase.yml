@@ -10,7 +10,25 @@
   become: yes
   gather_facts: true
   tasks:
-  - name: Install packages
+  - name: Update all packages
+    dnf: name=* state=latest
+  - name: Ensuring certain packages
     dnf: name={{ item }} state=present
     with_items:
     - git
+    - zsh
+    - ruby
+    - rubygems
+  - name: Set default shell
+    user: name=vagrant shell=/bin/zsh
+
+- hosts: all
+  tasks:
+  - name: Install antigen
+    git: repo=https://github.com/zsh-users/antigen.git dest="{{ ansible_env.HOME }}/config/antigen"
+  - name: Install homesick
+    gem: name=homesick state=latest
+  - name: Configure castle
+    shell: >-
+      homesick clone malkarouri/dotfiles &&
+      homesick symlink dotfiles
