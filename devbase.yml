@@ -20,6 +20,11 @@
     - ruby
     - rubygems
     - emacs
+    - python-setuptools
+    - python-pip
+    - python-wheel
+    - redhat-rpm-config
+    - python-devel
   roles:
   - docker
 
@@ -45,3 +50,5 @@
     when: result|failed
   - name: Configure castle
     shell: homesick symlink dotfiles
+  - name: Install nix
+    shell: curl https://nixos.org/nix/install | sh
