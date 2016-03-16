@@ -25,14 +25,25 @@
     - python-wheel
     - redhat-rpm-config
     - python-devel
-  roles:
-  - docker
+    - python-tox
+    - python-sphinx
+    - jenkins
+    - the_silver_searcher
+    - python-pygments
+    - docker
+    - docker-compose
+    - haproxy
+    - jq
+  - name: Enable Jenkins
+    service: name=jenkins enabled=yes state=started
+  - name: Enable Docker
+    service: name=docker enabled=yes state=started
 
 - hosts: all
   become: yes
   tasks:
   - name: Set default shell
-    user: name=vagrant shell=/bin/zsh groups=docker append=yes
+    user: name=vagrant shell=/bin/zsh groups=dockerroot append=yes
 
 - hosts: all
   tasks:
@@ -51,4 +62,33 @@
   - name: Configure castle
     shell: homesick symlink dotfiles
   - name: Install nix
-    shell: curl https://nixos.org/nix/install | sh
+    shell: curl https://nixos.org/nix/install | sh creates=/nix
+
+- hosts: all
+  become: yes
+  tasks:
+  - name: Redis Container
+    docker:
+      name: redis
+      image: redis
+      command: redis-server --appendonly yes
+      state: started
+      expose:
+      - 6379
+  - name: Consul
+    docker:
+      name: consul
+      image: gliderlabs/consul-server
+      net: host
+      command: -bootstrap
+      state: started
+  - name: Registrator
+    docker:
+      name: registrator
+      image: gliderlabs/registrator:latest
+      net: host
+      command: consul://localhost:8500
+      volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+      state: started
+
