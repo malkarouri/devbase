@@ -9,6 +9,7 @@ Vagrant.configure(2) do |config|
   # Run Ansible from the Vagrant VM
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "devbase.yml"
+    ansible.galaxy_role_file = "requirements.yml"
     ansible.verbose = "vvvv"
   end
 end

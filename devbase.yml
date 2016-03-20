@@ -35,6 +35,7 @@
     - docker-compose
     - haproxy
     - jq
+    - tree
   - name: Enable Jenkins
     service: name=jenkins enabled=yes state=started
   - name: Enable Docker
@@ -68,20 +69,12 @@
 - hosts: all
   become: yes
   tasks:
-  - name: Redis Container
-    docker:
-      name: redis
-      image: redis
-      command: redis-server --appendonly yes
-      state: started
-      expose:
-      - 6379
   - name: Consul
     docker:
       name: consul
       image: gliderlabs/consul-server
       net: host
-      command: -bootstrap
+      command: -bootstrap -advertise=127.0.0.1
       state: started
   - name: Registrator
     docker:
@@ -92,4 +85,10 @@
       volumes:
       - /var/run/docker.sock:/tmp/docker.sock
       state: started
-
+  - name: Redis Container
+    docker:
+      name: redis
+      image: redis
+      command: redis-server --appendonly yes
+      state: started
+      publish_all_ports: yes
