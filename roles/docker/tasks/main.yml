@@ -1,9 +1,0 @@
----
-- name: Set Docker repo
-  copy: src=docker.repo dest=/etc/yum.repos.d/docker.repo
-- name: Update all packages
-  dnf: name=* state=latest
-- name: Install Docker engine
-  dnf: name=docker-engine state=latest
-- name: Start Docker daemon
-  service: name=docker enabled=yes state=started
