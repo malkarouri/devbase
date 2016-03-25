@@ -10,11 +10,14 @@
   become: yes
   gather_facts: true
   tasks:
+  - name: SELinux weakened for rkt
+    selinux: policy=targeted state=permissive
   - name: Update all packages
     dnf: name=* state=latest
   - name: Ensuring certain packages
     dnf: name={{ item }} state=present
     with_items:
+    - texlive-scheme-full
     - zlib-devel
     - git
     - zsh
