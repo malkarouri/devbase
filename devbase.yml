@@ -15,12 +15,14 @@
   - name: Ensuring certain packages
     dnf: name={{ item }} state=present
     with_items:
+    - zlib-devel
     - git
     - zsh
     - tmux
     - ruby
     - rubygems
     - emacs
+    - emacs-w3m
     - python-setuptools
     - python-pip
     - python-wheel
@@ -36,10 +38,13 @@
     - haproxy
     - jq
     - tree
+    - libjpeg-turbo-devel
   - name: Enable Jenkins
     service: name=jenkins enabled=yes state=started
   - name: Enable Docker
     service: name=docker enabled=yes state=started
+  roles:
+    - rkt
 
 - hosts: all
   become: yes
@@ -61,7 +66,7 @@
   - name: Configure castle
     shell: homesick clone malkarouri/dotfiles
     when: result|failed
-  - name: Configure castle
+  - name: Link castle files
     shell: homesick symlink dotfiles
   - name: Install nix
     shell: curl https://nixos.org/nix/install | sh creates=/nix
@@ -74,7 +79,7 @@
       name: consul
       image: gliderlabs/consul-server
       net: host
-      command: -bootstrap -advertise=127.0.0.1
+      command: -bootstrap -advertise=127.0.0.1 -ui
       state: started
   - name: Registrator
     docker:

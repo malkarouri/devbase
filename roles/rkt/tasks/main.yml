@@ -1,0 +1,22 @@
+---
+- name: Check if rkt exists
+  stat: path="{{ ansible_env.HOME }}/rkt-v1.2.0/rkt"
+  register: rkt_executable
+- name: Download rkt
+  get_url:
+  args:
+    url: https://github.com/coreos/rkt/releases/download/v1.2.0/rkt-v1.2.0.tar.gz
+    dest: "{{ ansible_env.HOME }}"
+  when: not (rkt_executable.stat.xusr is defined and rkt_executable.stat.xusr)
+- name: Unarchive rkt
+  unarchive:
+  args:
+    src: "{{ ansible_env.HOME }}/rkt-v1.2.0.tar.gz"
+    dest: "{{ ansible_env.HOME }}"
+    copy: no
+    creates: "{{ ansible_env.HOME }}/rkt-v1.2.0/rkt"
+- name: Put rkt in local bin folder
+  synchronize:
+    src: "{{ ansible_env.HOME }}/rkt-v1.2.0/rkt"
+    dest: "/usr/local/bin/rkt"
+  delegate_to: "{{ inventory_hostname }}"
