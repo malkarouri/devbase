@@ -33,6 +33,9 @@
     - python-devel
     - python-tox
     - python-sphinx
+    - python-ipython
+    - bpython
+    - python-nbformat
     - jenkins
     - the_silver_searcher
     - python-pygments
@@ -73,6 +76,11 @@
     shell: homesick symlink dotfiles
   - name: Install nix
     shell: curl https://nixos.org/nix/install | sh creates=/nix
+  - name: Install Nuitka
+    pip: name={{ item }} state=latest extra_args="--user"
+    with_items:
+    - nuitka
+    - jupyter
 
 - hosts: all
   become: yes
