@@ -91,7 +91,8 @@
       image: gliderlabs/consul-server
       net: host
       command: -bootstrap -advertise=127.0.0.1 -ui
-      state: started
+      state: reloaded
+      restart_policy: always
   - name: Registrator
     docker:
       name: registrator
@@ -100,11 +101,13 @@
       command: consul://localhost:8500
       volumes:
       - /var/run/docker.sock:/tmp/docker.sock
-      state: started
+      state: reloaded
+      restart_policy: always
   - name: Redis Container
     docker:
       name: redis
       image: redis
       command: redis-server --appendonly yes
-      state: started
+      state: reloaded
+      restart_policy: always
       publish_all_ports: yes
